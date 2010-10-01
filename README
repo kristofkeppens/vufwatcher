@@ -1,0 +1,6 @@
+vufwatcher.py
+
+a python script to monitor a directory for vuf files ( although possible to
+change the extension to monitor ). Made for mediamosa batch upload program.
+
+Run the script with -h switch for more information
