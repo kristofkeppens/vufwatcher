@@ -45,9 +45,12 @@ if __name__ == '__main__':
 	if len(sys.argv) != 2:
 		print >> sys.stderr, "Command Line error: missing path to folder."
 		sys.exit(1)
-
+	if sys.argv[1] == '-h':
+		print 'The script accepts only one argument, the path to the folder to watch. Use as ./vufwatcher.py path'
+		sys.exit(1)
 	#required arguments
 	path = sys.argv[1]
+
 	#Mediamosa settings
 	ext = 'vuf'
 	cmd = 'notify-send'
