@@ -17,15 +17,16 @@ class OnWriteHandler(pyinotify.ProcessEvent):
 		self.extensions = extension
 		self.cmd = cmd
 	
-	def _run_cmd(self):
-		print '==> Modification detected'
-		subprocess.call(self.cmd.split(' '), cwd=self.cwd)
+	def _run_cmd(self, pathname ):
+		print '==> Modification detected: %s' % pathname
+		cmd = self.cmd.split(' ')
+		cmd.append(pathname)
+		subprocess.call(cmd, cwd=self.cwd)
 
 	def process_IN_CREATE(self,event):
-		print self.extensions
-		if all(not event.pathname.endswith(ext) for ext in self.extensions):
+		if (not event.pathname.endswith(ext)):
 			return
-		self._run_cmd()
+		self._run_cmd(event.pathname)
 
 def vuf_watch(path, extension, cmd):
 	wm = pyinotify.WatchManager()
@@ -33,7 +34,7 @@ def vuf_watch(path, extension, cmd):
 	notifier = pyinotify.Notifier(wm, default_proc_fun=handler)
 	wm.add_watch(path, pyinotify.ALL_EVENTS, rec=True, auto_add=True)
 	print '==> Start Monitoring for %s files in %s ( Type C^c to exit )' % (extension, path)
-	notifier.loop()
+	notifier.loop(daemonize=True)
 
 if __name__ == '__main__':
 	if len(sys.argv) != 2:
@@ -44,7 +45,7 @@ if __name__ == '__main__':
 	path = sys.argv[1]
 	#Mediamosa settings
 	ext = 'vuf'
-	cmd = 'echo works'
+	cmd = 'notify-send'
 
 	#monitor for vuf files
 	vuf_watch(path, ext, cmd)
