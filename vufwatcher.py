@@ -28,6 +28,11 @@ class OnWriteHandler(pyinotify.ProcessEvent):
 			return
 		self._run_cmd(event.pathname)
 
+	def process_IN_MODIFY(self,event):
+		if (not event.pathname.endswith(ext)):
+			return
+		self._run_cmd(event.pathname)
+
 def vuf_watch(path, extension, cmd):
 	wm = pyinotify.WatchManager()
 	handler = OnWriteHandler(cwd=path, extension=extension, cmd=cmd)
