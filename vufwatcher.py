@@ -10,6 +10,9 @@
 import subprocess
 import sys
 import pyinotify
+from optparse import OptionParser
+
+daemon = 0
 
 class OnWriteHandler(pyinotify.ProcessEvent):
 	def my_init(self, cwd, extension, cmd):
@@ -33,27 +36,42 @@ class OnWriteHandler(pyinotify.ProcessEvent):
 			return
 		self._run_cmd(event.pathname)
 
-def vuf_watch(path, extension, cmd):
+def vuf_watch(path, extension, cmd):	
 	wm = pyinotify.WatchManager()
 	handler = OnWriteHandler(cwd=path, extension=extension, cmd=cmd)
 	notifier = pyinotify.Notifier(wm, default_proc_fun=handler)
 	wm.add_watch(path, pyinotify.ALL_EVENTS, rec=True, auto_add=True)
 	print '==> Start Monitoring for %s files in %s ( Type C^c to exit )' % (extension, path)
-	notifier.loop(daemonize=True)
+	print daemon
+	sys.exit(1)
+	if(daemon):
+		notifier.loop(daemonize=True)
+	else:
+		notifier.loop()
 
-if __name__ == '__main__':
-	if len(sys.argv) != 2:
-		print >> sys.stderr, "Command Line error: missing path to folder."
-		sys.exit(1)
-	if sys.argv[1] == '-h':
-		print 'The script accepts only one argument, the path to the folder to watch. Use as ./vufwatcher.py path'
-		sys.exit(1)
-	#required arguments
-	path = sys.argv[1]
+def main():	
+	usage = "usage: %prog [options] arg"
+	parser = OptionParser(usage, conflict_handler='resolve')
+	parser.add_option("-p", "--path", nargs=1, help="Path to the directory to monitor.", dest="path")
+	parser.add_option("-d", "--daemon", action="store_true", dest="daemon", help="Run this script as daemon.")
+
+	(options, args) = parser.parse_args()
+
+	if len(sys.argv) <=2:
+		parser.error("Path is a required argument.")
+		sys.exit(2)
+	if options.daemon:
+		daemon = 1
+	if options.path == '':
+		parser.error("Path is a required argument.")
+		sys.exit(2)
 
 	#Mediamosa settings
 	ext = 'vuf'
 	cmd = 'php /path/' #path to process.php
 
 	#monitor for vuf files
-	vuf_watch(path, ext, cmd)
+	vuf_watch(options.path, ext, cmd)
+
+if __name__ == '__main__':
+	main()
