@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
 	#Mediamosa settings
 	ext = 'vuf'
-	cmd = 'php /path/' #path to process.php
+	cmd = 'notify-send'
 
 	#monitor for vuf files
 	vuf_watch(path, ext, cmd)
