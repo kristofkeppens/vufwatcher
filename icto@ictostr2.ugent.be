@@ -25,12 +25,12 @@ class OnWriteHandler(pyinotify.ProcessEvent):
 		subprocess.call(cmd, cwd=self.cwd)
 
 	def process_IN_CREATE(self,event):
-		if (not event.pathname.endswith(ext)):
+		if (not event.pathname.endswith(self.extension)):
 			return
 		self._run_cmd(event.pathname)
 
 	def process_IN_MODIFY(self,event):
-		if (not event.pathname.endswith(ext)):
+		if (not event.pathname.endswith(self.extension)):
 			return
 		self._run_cmd(event.pathname)
 
@@ -60,13 +60,14 @@ def main():
 		daemon = 1
 	if options.path == '':
 		parser.error("Path is a required argument.")
-		sys.exit(2)	
+		sys.exit(2)
+
+	#Mediamosa settings
+	ext = 'vuf'
+	cmd = 'php /path/' #path to process.php
 
 	#monitor for vuf files
 	vuf_watch(options.path, ext, cmd, daemon)
 
 if __name__ == '__main__':
-#Mediamosa settings
-	ext = 'vuf'
-	cmd = 'php /path/' #path to process.php
 	main()
