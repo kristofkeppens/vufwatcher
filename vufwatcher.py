@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Usage:
-#	    .vufwatcher.py path
+#	    .vufwatcher.py -p path
 #
 # Dependancies:
 #     Linux ( with inotify ), Python > 2.6, Pyinotify > 2.8
@@ -24,7 +24,7 @@ class OnWriteHandler(pyinotify.ProcessEvent):
 		cmd.append(pathname)
 		subprocess.call(cmd, cwd=self.cwd)
 
-	def process_IN_CREATE(self,event):
+	def process_IN_CLOSE_WRITE(self,event):
 		if (not event.pathname.endswith(ext)):
 			return
 		self._run_cmd(event.pathname)
